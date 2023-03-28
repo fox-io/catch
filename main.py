@@ -105,13 +105,14 @@ class Catch:
         return target_sprite
 
     def event_handler(self, e):
+        # Exit Program if requested
         if e.type == pygame.QUIT:
-            # Exit Program if requested
             return False
+        # Handle Keyboard Input
         elif e.type == pygame.KEYDOWN or e.type == pygame.KEYUP:
-            # Handle Keyboard Input
             self.moving_left = e.type == pygame.KEYDOWN and e.key == pygame.K_a and True or False
             self.moving_right = e.type == pygame.KEYDOWN and e.key == pygame.K_d and True or False
+
         # Continue Running
         return True
 
