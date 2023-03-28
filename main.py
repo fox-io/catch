@@ -100,7 +100,8 @@ class Catch:
         target_sprite = pygame.sprite.Sprite()
         target_sprite.image = self.target_surface
         target_sprite.rect = self.target_surface.get_rect()
-        target_sprite.rect.x = random.randint(self.target_sprite_size, self.screen.get_width() - self.target_sprite_size)
+        target_sprite.rect.x = random.randint(self.target_sprite_size,
+                                              self.screen.get_width() - self.target_sprite_size)
         target_sprite.rect.y = 0
         return target_sprite
 
