@@ -12,6 +12,11 @@ class Catch:
         pygame.display.set_caption("Catch")
         self.screen.fill((0, 0, 0))
 
+        self.background_sprite_speed = 5
+        self.background_sprite = pygame.image.load('background.png').convert_alpha()
+        self.background_sprite_topleft = 0
+        self.background_sprite_bottomleft = -600
+
         self.player_sprite_size = 32
         self.player_surface = pygame.image.load("fox.png")
         self.player_sprite = pygame.sprite.Sprite()
@@ -37,6 +42,7 @@ class Catch:
         self.sprite_group = pygame.sprite.Group()
         self.sprite_group.add(self.player_sprite)
         self.sprite_group.draw(self.screen)
+
         pygame.display.flip()
 
     def create_target(self):
@@ -86,7 +92,18 @@ while running:
             app.target_sprite_group.remove(target)
 
     app.screen.fill((0, 0, 0))
+    app.background_sprite_topleft += app.background_sprite_speed
+    app.background_sprite_bottomleft += app.background_sprite_speed
+
+    if app.background_sprite_topleft >= app.screen_height:
+        app.background_sprite_topleft = app.background_sprite_bottomleft - app.screen_height
+    elif app.background_sprite_bottomleft >= app.screen_height:
+        app.background_sprite_bottomleft = app.background_sprite_topleft - app.screen_height
+
     score_text = app.font.render(f"Score: {app.score}", True, (255, 255, 255))
+
+    app.screen.blit(app.background_sprite, (0, app.background_sprite_topleft))
+    app.screen.blit(app.background_sprite, (0, app.background_sprite_bottomleft))
     app.screen.blit(score_text, (100, 100))
     app.sprite_group.draw(app.screen)
     app.target_sprite_group.draw(app.screen)
