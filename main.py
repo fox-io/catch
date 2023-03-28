@@ -38,6 +38,7 @@ class Catch:
         self.target_surface = pygame.image.load("target.png")
         self.target_move_speed = 3
         self.target_sprite_group = pygame.sprite.Group()
+        self.target_creation_timer = 1000
 
         # Font Variables
         self.font = pygame.font.SysFont("Arial", 32)
@@ -45,8 +46,9 @@ class Catch:
         # Score Variables
         self.score = 0
 
-        # Clock Variables
+        # Target Creation Timer
         self.clock = pygame.time.Clock()
+        pygame.time.set_timer(pygame.USEREVENT, self.target_creation_timer)
 
         self.update_screen()
 
@@ -58,11 +60,6 @@ class Catch:
         elif self.moving_right:
             if self.player_sprite.rect.x < self.screen.get_width() - self.player_sprite_size:
                 self.player_sprite.rect.x += self.player_move_speed
-
-        # Add target every 60 ticks
-        if pygame.time.get_ticks() % 60 == 0:
-            target_object = self.create_target()
-            self.target_sprite_group.add(target_object)
 
         # Move targets and check for collisions
         for target in self.target_sprite_group.sprites():
@@ -122,6 +119,10 @@ class Catch:
                 self.moving_left = False
             elif e.key == pygame.K_d:
                 self.moving_right = False
+        # Create Targets Every x Seconds
+        elif e.type == pygame.USEREVENT:
+            target_object = self.create_target()
+            self.target_sprite_group.add(target_object)
 
         # Continue Running
         return True
