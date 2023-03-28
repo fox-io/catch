@@ -112,9 +112,16 @@ class Catch:
         if e.type == pygame.QUIT:
             return False
         # Handle Keyboard Input
-        elif e.type == pygame.KEYDOWN or e.type == pygame.KEYUP:
-            self.moving_left = e.type == pygame.KEYDOWN and e.key == pygame.K_a and True or False
-            self.moving_right = e.type == pygame.KEYDOWN and e.key == pygame.K_d and True or False
+        elif e.type == pygame.KEYDOWN:
+            if e.key == pygame.K_a:
+                self.moving_left = True
+            elif e.key == pygame.K_d:
+                self.moving_right = True
+        elif e.type == pygame.KEYUP:
+            if e.key == pygame.K_a:
+                self.moving_left = False
+            elif e.key == pygame.K_d:
+                self.moving_right = False
 
         # Continue Running
         return True
