@@ -15,8 +15,8 @@ class Catch:
         # Background Sprite Variables
         self.background_sprite_speed = 5
         self.background_sprite = pygame.image.load('background.png').convert_alpha()
-        self.background_sprite_topleft = 0
-        self.background_sprite_bottomleft = -600
+        self.background_sprite_one = 0
+        self.background_sprite_two = -600
 
         # Player Sprite Variables
         self.player_sprite_size = 32
@@ -53,9 +53,11 @@ class Catch:
     def update_screen(self):
         # Move player if player is moving
         if self.moving_left:
-            self.player_sprite.rect.x -= self.player_move_speed
+            if self.player_sprite.rect.x > 0:
+                self.player_sprite.rect.x -= self.player_move_speed
         elif self.moving_right:
-            self.player_sprite.rect.x += self.player_move_speed
+            if self.player_sprite.rect.x < self.screen.get_width() - self.player_sprite_size:
+                self.player_sprite.rect.x += self.player_move_speed
 
         # Add target every 60 ticks
         if pygame.time.get_ticks() % 60 == 0:
@@ -74,21 +76,21 @@ class Catch:
                 self.target_sprite_group.remove(target)
 
         # Move background
-        self.background_sprite_topleft += self.background_sprite_speed
-        self.background_sprite_bottomleft += self.background_sprite_speed
+        self.background_sprite_one += self.background_sprite_speed
+        self.background_sprite_two += self.background_sprite_speed
 
         # Loop background
-        if self.background_sprite_topleft >= self.screen_height:
-            self.background_sprite_topleft = self.background_sprite_bottomleft - self.screen_height
-        elif self.background_sprite_bottomleft >= self.screen_height:
-            self.background_sprite_bottomleft = self.background_sprite_topleft - self.screen_height
+        if self.background_sprite_one >= self.screen_height:
+            self.background_sprite_one = self.background_sprite_two - self.screen_height
+        elif self.background_sprite_two >= self.screen_height:
+            self.background_sprite_two = self.background_sprite_one - self.screen_height
 
         # Create Update Score Text
         score_text = self.font.render(f"Score: {self.score}", True, (255, 255, 255))
 
         # Blit Sprites
-        self.screen.blit(self.background_sprite, (0, self.background_sprite_topleft))
-        self.screen.blit(self.background_sprite, (0, self.background_sprite_bottomleft))
+        self.screen.blit(self.background_sprite, (0, self.background_sprite_one))
+        self.screen.blit(self.background_sprite, (0, self.background_sprite_two))
         self.sprite_group.draw(self.screen)
         self.target_sprite_group.draw(self.screen)
         self.screen.blit(score_text, (100, 100))
