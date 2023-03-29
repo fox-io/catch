@@ -82,7 +82,7 @@ class Catch:
 
         if self.score < 0:
             self.score = 0
-            
+
         for obstacle in self.obstacle_sprite_group.sprites():
             obstacle.rect.y += self.obstacle_move_speed
 
