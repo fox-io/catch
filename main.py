@@ -13,7 +13,7 @@ class Catch:
         pygame.display.set_caption("Catch")
 
         # Background Sprite Variables
-        self.background_sprite_speed = 5
+        self.background_sprite_speed = 3
         self.background_sprite = pygame.image.load('background.png').convert_alpha()
         self.background_sprite_one = 0
         self.background_sprite_two = -600
@@ -39,6 +39,13 @@ class Catch:
         self.target_move_speed = 3
         self.target_sprite_group = pygame.sprite.Group()
         self.target_creation_timer = 1000
+
+        # Obstacle Sprite Variables
+        self.obstacle_sprite_size = 32
+        self.obstacle_surface = pygame.image.load("tree.png")
+        self.obstacle_move_speed = 3
+        self.obstacle_sprite_group = pygame.sprite.Group()
+        self.obstacle_creation_timer = 1000
 
         # Font Variables
         self.font = pygame.font.SysFont("Arial", 32)
@@ -66,11 +73,25 @@ class Catch:
             target.rect.y += self.target_move_speed
 
             if target.rect.y > self.screen.get_height():
+                self.score -= 1
                 self.target_sprite_group.remove(target)
 
             if pygame.sprite.collide_rect(self.player_sprite, target):
                 self.score += 1
                 self.target_sprite_group.remove(target)
+
+        if self.score < 0:
+            self.score = 0
+            
+        for obstacle in self.obstacle_sprite_group.sprites():
+            obstacle.rect.y += self.obstacle_move_speed
+
+            if obstacle.rect.y > self.screen.get_height():
+                self.obstacle_sprite_group.remove(obstacle)
+
+            if pygame.sprite.collide_rect(self.player_sprite, obstacle):
+                self.score = 0
+                self.obstacle_sprite_group.remove(obstacle)
 
         # Move background
         self.background_sprite_one += self.background_sprite_speed
@@ -90,6 +111,7 @@ class Catch:
         self.screen.blit(self.background_sprite, (0, self.background_sprite_two))
         self.sprite_group.draw(self.screen)
         self.target_sprite_group.draw(self.screen)
+        self.obstacle_sprite_group.draw(self.screen)
         self.screen.blit(score_text, (100, 100))
 
         # Update Screen
@@ -103,6 +125,15 @@ class Catch:
                                               self.screen.get_width() - self.target_sprite_size)
         target_sprite.rect.y = 0
         return target_sprite
+
+    def create_obstacle(self):
+        obstacle_sprite = pygame.sprite.Sprite()
+        obstacle_sprite.image = self.obstacle_surface
+        obstacle_sprite.rect = self.obstacle_surface.get_rect()
+        obstacle_sprite.rect.x = random.randint(self.obstacle_sprite_size,
+                                                self.screen.get_width() - self.obstacle_sprite_size)
+        obstacle_sprite.rect.y = 0
+        return obstacle_sprite
 
     def event_handler(self, e):
         # Exit Program if requested
@@ -119,10 +150,13 @@ class Catch:
                 self.moving_left = False
             elif e.key == pygame.K_d:
                 self.moving_right = False
-        # Create Targets Every x Seconds
+        # Create Targets and obstacles Every x Seconds
         elif e.type == pygame.USEREVENT:
             target_object = self.create_target()
             self.target_sprite_group.add(target_object)
+
+            obstacle_object = self.create_obstacle()
+            self.obstacle_sprite_group.add(obstacle_object)
 
         # Continue Running
         return True
