@@ -5,10 +5,12 @@ pygame.init()
 
 
 class Catch:
+    colors = {'white': (255, 255, 255)}
+    screen_width = 400
+    screen_height = 600
+
     def __init__(self):
         # Pygame Screen Variables
-        self.screen_width = 400
-        self.screen_height = 600
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
         pygame.display.set_caption("Catch")
 
@@ -18,19 +20,51 @@ class Catch:
         self.background_sprite_one = 0
         self.background_sprite_two = -600
 
-        # Player Sprite Variables
-        self.player_sprite_size = 32
-        self.player_surface = pygame.image.load("fox.png")
-        self.player_sprite = pygame.sprite.Sprite()
-        self.player_sprite.image = self.player_surface
-        self.player_sprite.rect = self.player_surface.get_rect()
-        self.player_sprite.rect.x = self.screen_width / 2 - (self.player_sprite_size / 2)
-        self.player_sprite.rect.y = self.screen_height - (self.player_sprite_size * 2)
-        self.player_move_speed = 6
-        self.moving_left = False
-        self.moving_right = False
+        # Create Player
+        class Player:
+            # Player Variables and Flags
+            sprite_size = 32
+            move_speed = 6
+            moving_left = False
+            moving_right = False
+
+            def __init__(self, screen_width, screen_height):
+                self.screen_width = screen_width
+                self.screen_height = screen_height
+                # Load player image
+                self.image = pygame.image.load("fox.png")
+                # Create player sprite from image
+                self.sprite = pygame.sprite.Sprite()
+                self.sprite.image = self.image
+                self.sprite.rect = self.image.get_rect()
+                # Set player location to center of bottom of screen.
+                self.sprite.rect.x = self.screen_width / 2 - (self.sprite_size / 2)
+                self.sprite.rect.y = self.screen_height - (self.sprite_size * 2)
+
+            def move(self):
+                if self.moving_left:
+                    if self.sprite.rect.x > 0:
+                        self.sprite.rect.x -= self.move_speed
+                elif self.moving_right:
+                    if self.sprite.rect.x < self.screen_width - self.sprite_size:
+                        self.sprite.rect.x += self.move_speed
+
+            def event_handler(self, e):
+                if e.type == pygame.KEYDOWN:
+                    if e.key == pygame.K_a:
+                        self.moving_left = True
+                    elif e.key == pygame.K_d:
+                        self.moving_right = True
+                elif e.type == pygame.KEYUP:
+                    if e.key == pygame.K_a:
+                        self.moving_left = False
+                    elif e.key == pygame.K_d:
+                        self.moving_right = False
+
+        # Create player and assign it to a sprite group
+        self.player = Player(self.screen_width, self.screen_height)
         self.sprite_group = pygame.sprite.Group()
-        self.sprite_group.add(self.player_sprite)
+        self.sprite_group.add(self.player.sprite)
         self.sprite_group.draw(self.screen)
 
         # Target Sprite Variables
@@ -53,20 +87,17 @@ class Catch:
         # Score Variables
         self.score = 0
 
-        # Target Creation Timer
+        # Clock
         self.clock = pygame.time.Clock()
+
+        # Target Creation Timer
         pygame.time.set_timer(pygame.USEREVENT, self.target_creation_timer)
 
         self.update_screen()
 
     def update_screen(self):
         # Move player if player is moving
-        if self.moving_left:
-            if self.player_sprite.rect.x > 0:
-                self.player_sprite.rect.x -= self.player_move_speed
-        elif self.moving_right:
-            if self.player_sprite.rect.x < self.screen.get_width() - self.player_sprite_size:
-                self.player_sprite.rect.x += self.player_move_speed
+        self.player.move()
 
         # Move targets and check for collisions
         for target in self.target_sprite_group.sprites():
@@ -76,7 +107,7 @@ class Catch:
                 self.score -= 1
                 self.target_sprite_group.remove(target)
 
-            if pygame.sprite.collide_rect(self.player_sprite, target):
+            if pygame.sprite.collide_rect(self.player.sprite, target):
                 self.score += 1
                 self.target_sprite_group.remove(target)
 
@@ -89,7 +120,7 @@ class Catch:
             if obstacle.rect.y > self.screen.get_height():
                 self.obstacle_sprite_group.remove(obstacle)
 
-            if pygame.sprite.collide_rect(self.player_sprite, obstacle):
+            if pygame.sprite.collide_rect(self.player.sprite, obstacle):
                 self.score = 0
                 self.obstacle_sprite_group.remove(obstacle)
 
@@ -104,7 +135,7 @@ class Catch:
             self.background_sprite_two = self.background_sprite_one - self.screen_height
 
         # Create Update Score Text
-        score_text = self.font.render(f"Score: {self.score}", True, (255, 255, 255))
+        score_text = self.font.render(f"Score: {self.score}", True, self.colors['white'])
 
         # Blit Sprites
         self.screen.blit(self.background_sprite, (0, self.background_sprite_one))
@@ -136,22 +167,15 @@ class Catch:
         return obstacle_sprite
 
     def event_handler(self, e):
+        # Pass events to Player class
+        self.player.event_handler(e)
+
         # Exit Program if requested
         if e.type == pygame.QUIT:
             return False
-        # Handle Keyboard Input
-        elif e.type == pygame.KEYDOWN:
-            if e.key == pygame.K_a:
-                self.moving_left = True
-            elif e.key == pygame.K_d:
-                self.moving_right = True
-        elif e.type == pygame.KEYUP:
-            if e.key == pygame.K_a:
-                self.moving_left = False
-            elif e.key == pygame.K_d:
-                self.moving_right = False
+
         # Create Targets and obstacles Every x Seconds
-        elif e.type == pygame.USEREVENT:
+        if e.type == pygame.USEREVENT:
             target_object = self.create_target()
             self.target_sprite_group.add(target_object)
 
@@ -172,7 +196,10 @@ while running:
         # Run until event handler returns False
         running = app.event_handler(event)
 
+    # Update screen every frame
     app.update_screen()
+
+    # Keep clock at 60 fps
     app.clock.tick(60)
 
 # End Program
