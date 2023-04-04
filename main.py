@@ -8,9 +8,7 @@ class Target:
     IMAGE = pygame.image.load('target.png')
     SIZE = 32  # Size in pixels of target image
     SPEED = 3  # Speed at which target moves
-    OFF_SCREEN = 0
-    HIT_PLAYER = 1
-    OK = 2
+    STATUS = {'OFF_SCREEN': 0, 'HIT_PLAYER': 1, 'OK': 2}
 
     def __init__(self, window):
         self.sprite = pygame.sprite.Sprite()
@@ -24,10 +22,10 @@ class Target:
     def on_update(self, window, player):
         self.sprite.rect.y += self.SPEED  # Move the sprite
         if self.sprite.rect.y > window['HEIGHT']:
-            return self.OFF_SCREEN
+            return self.STATUS['OFF_SCREEN']
         if pygame.sprite.collide_rect(player.sprite, self.sprite):
-            return self.HIT_PLAYER
-        return self.OK  # Return self.OK if sprite is still on screen
+            return self.STATUS['HIT_PLAYER']
+        return self.STATUS['OK']
 
 
 class Player:
@@ -75,29 +73,32 @@ class Obstacle:
     IMAGE = pygame.image.load('tree.png')
     SIZE = 32  # Width of sprite
     SPEED = 3  # Speed at which obstacle moves
-    OFF_SCREEN = 0
-    HIT_PLAYER = 1
-    OK = 2
+    STATUS = {'OFF_SCREEN': 0, 'HIT_PLAYER': 1, 'OK': 2}
 
     def __init__(self, window):
+        # Create obstacle sprite
         self.sprite = pygame.sprite.Sprite()
         self.sprite.image = self.IMAGE
         self.sprite.rect = self.IMAGE.get_rect()
-        # Assign a random value (within screen constraints) to the x coordinate of the sprite
+
+        # Randomly assign the x-axis spawn point. y-axis is -32 to spawn off-screen
         self.sprite.rect.x = random.randint(self.SIZE, window['WIDTH'] - self.SIZE)
-        # Set the y coordinate of the sprite to 0
         self.sprite.rect.y = -32
 
     def on_update(self, window, player):
-        # Process updates for Obstacles.  Remove obstacles that are off-screen.
+        # Move obstacle
         self.sprite.rect.y += self.SPEED
+
+        # Check if obstacle is off-screen
         if self.sprite.rect.y > window['HEIGHT']:
-            return self.OFF_SCREEN
+            return self.STATUS['OFF_SCREEN']
 
+        # Check if obstacle has hit player
         if pygame.sprite.collide_rect(player.sprite, self.sprite):
-            return self.HIT_PLAYER
+            return self.STATUS['HIT_PLAYER']
 
-        return self.OK
+        # Return self.OK if obstacle is still in play
+        return self.STATUS['OK']
 
 
 class Background:
@@ -168,12 +169,12 @@ class Game:
         # Process updates for Targets.  Remove targets that are off-screen.
         for target in self.targets:
             target_status = target.on_update(self.WINDOW, self.player)
-            if target_status == target.OFF_SCREEN:
+            if target_status == target.STATUS['OFF_SCREEN']:
                 self.targets.remove(target)
                 self.sprites.remove(target.sprite)
                 # Lose one point if target is missed
                 self.score.score -= 1
-            elif target_status == target.HIT_PLAYER:
+            elif target_status == target.STATUS['HIT_PLAYER']:
                 self.targets.remove(target)
                 self.sprites.remove(target.sprite)
                 # Gain one point if target is caught
@@ -182,10 +183,10 @@ class Game:
         # Process updates for Obstacles.  Remove obstacles that are off-screen.
         for obstacle in self.obstacles:
             obstacle_status = obstacle.on_update(self.WINDOW, self.player)
-            if obstacle_status == obstacle.OFF_SCREEN:
+            if obstacle_status == obstacle.STATUS['OFF_SCREEN']:
                 self.obstacles.remove(obstacle)
                 self.sprites.remove(obstacle.sprite)
-            elif obstacle_status == obstacle.HIT_PLAYER:
+            elif obstacle_status == obstacle.STATUS['HIT_PLAYER']:
                 self.obstacles.remove(obstacle)
                 self.sprites.remove(obstacle.sprite)
                 # Lose all points if obstacle is hit
