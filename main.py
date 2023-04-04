@@ -129,6 +129,9 @@ class Score:
         self.score = 0
 
     def on_update(self):
+        # Prevent negative scores
+        if self.score < 0:
+            self.score = 0
         self.text = self.font.render(f"Score: {self.score}", True, self.COLORS['WHITE'])
 
 
@@ -169,7 +172,7 @@ class Game:
                 self.targets.remove(target)
                 self.sprites.remove(target.sprite)
                 # Lose one point if target is missed
-                self.score.score = self.score.score <= 1 and 0 or self.score.score - 1
+                self.score.score -= 1
             elif target_status == target.HIT_PLAYER:
                 self.targets.remove(target)
                 self.sprites.remove(target.sprite)
