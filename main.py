@@ -19,7 +19,7 @@ class Target:
         # Assign a random value (within screen constraints) to the x coordinate of the sprite
         self.sprite.rect.x = random.randint(self.SIZE, window['WIDTH'] - self.SIZE)
         # Set the y coordinate of the sprite to 0
-        self.sprite.rect.y = 0
+        self.sprite.rect.y = -32
 
     def on_update(self, window, player):
         self.sprite.rect.y += self.SPEED  # Move the sprite
@@ -86,7 +86,7 @@ class Obstacle:
         # Assign a random value (within screen constraints) to the x coordinate of the sprite
         self.sprite.rect.x = random.randint(self.SIZE, window['WIDTH'] - self.SIZE)
         # Set the y coordinate of the sprite to 0
-        self.sprite.rect.y = 0
+        self.sprite.rect.y = -32
 
     def on_update(self, window, player):
         # Process updates for Obstacles.  Remove obstacles that are off-screen.
