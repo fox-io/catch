@@ -5,7 +5,7 @@ pygame.init()
 
 
 class Target:
-    IMAGE = pygame.image.load('target.png')
+    IMAGE = pygame.image.load('assets/target.png')
     SIZE = 32  # Size in pixels of target image
     SPEED = 3  # Speed at which target moves
     STATUS = {'OFF_SCREEN': 0, 'HIT_PLAYER': 1, 'OK': 2}
@@ -30,7 +30,7 @@ class Target:
 
 class Player:
     # Shared Constants
-    IMAGE = pygame.image.load('fox.png')
+    IMAGE = pygame.image.load('assets/fox.png')
     SIZE = 32  # Width of sprite
     SPEED = 6  # Speed at which player moves
 
@@ -70,7 +70,7 @@ class Player:
 
 class Obstacle:
     # Shared Constants
-    IMAGE = pygame.image.load('tree.png')
+    IMAGE = pygame.image.load('assets/tree.png')
     SIZE = 32  # Width of sprite
     SPEED = 3  # Speed at which obstacle moves
     STATUS = {'OFF_SCREEN': 0, 'HIT_PLAYER': 1, 'OK': 2}
@@ -103,7 +103,7 @@ class Obstacle:
 
 class Background:
     # Constants
-    IMAGE = pygame.image.load('background.png')
+    IMAGE = pygame.image.load('assets/background.png')
     SPEED = 3
 
     def __init__(self, window):
